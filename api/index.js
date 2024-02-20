@@ -7,7 +7,9 @@ const mongoose=require("mongoose");
 const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser')
 require('dotenv').config();
+const multer = require('multer');
 const imageDownloader = require('image-downloader');
+const fs = require('fs')
 
 const bcryptSalt= bcrypt.genSaltSync(10);
 const jwtSecret = 'vguhjhgsrttf2554gh78vhg5fxvb8gdftxb3'
@@ -99,6 +101,23 @@ app.post('/login', async (req,res) => {
     });
     
     res.json(newName);
+  });
+
+
+  const photosMiddleware = multer({dest:'uploads/'});
+  app.post('/upload',photosMiddleware.array('photos',100), (req,res)=>{
+    
+    const uploadedFiles = [];
+    for(let i=0; i<req.files.length; i++){
+      const {path, orignalname} = req.files[i];
+      const parts = orignalname.split('.');
+      const ext = parts[parts.length -1];
+      const newPath = path + '.' + ext;
+      fs.renameSync(path,newPath);
+      uploadedFiles.push(newPath.replace('uploads/',''));
+    }
+    
+    res.json(uploadedFiles);
   });
  
 app.listen(4000);
