@@ -17,8 +17,6 @@ export default function PlacesPage(){
         <AccountNav/>
            
             <div className="text-center">
-               List of all added places
-               <br/>
                <Link className="bg-primary text-white py-2 px-6 rounded-full inline-flex gap-1" to={'/account/places/new'}>
                
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">

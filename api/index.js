@@ -74,6 +74,7 @@ app.post('/login', async (req,res) => {
     }
   });
 
+  //profile route
   app.get('/profile', (req,res) => {
     const {token} = req.cookies;
 
@@ -174,6 +175,11 @@ app.post('/login', async (req,res) => {
         res.json('ok');
       }
     });
+  });
+
+  app.get('/places', async (req,res) => {
+    mongoose.connect(process.env.MONGO_URL);
+    res.json( await Place.find() );
   });
  
 app.listen(4000);
