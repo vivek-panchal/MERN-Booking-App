@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const User =require('./models/User.js');
 const Place = require('./models/Place.js');
+const Booking = require('./models/Booking.js');
 const jwt = require('jsonwebtoken')
 const cors=require('cors');
 const mongoose=require("mongoose");
@@ -27,6 +28,14 @@ app.use(cors({
 
 mongoose.connect(process.env.MONGO_URL);
 
+function getUserDataFromReq(req) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
+      resolve(userData);
+    });
+  });
+}
 
 app.get('/test',(req,res) =>{
     res.json('test passed')
@@ -182,4 +191,28 @@ app.post('/login', async (req,res) => {
     res.json( await Place.find() );
   });
  
+  app.post('/bookings', async (req, res) => {
+    mongoose.connect(process.env.MONGO_URL);
+    const userData = await getUserDataFromReq(req);
+    const {
+      place,checkIn,checkOut,numberOfGuests,name,phone,price,
+    } = req.body;
+    Booking.create({
+      place,checkIn,checkOut,numberOfGuests,name,phone,price,
+      user:userData.id,
+    }).then((doc) => {
+      res.json(doc);
+    }).catch((err) => {
+      throw err;
+    });
+  });
+  
+  
+  
+  app.get('/bookings', async (req,res) => {
+    mongoose.connect(process.env.MONGO_URL);
+    const userData = await getUserDataFromReq(req);
+    res.json( await Booking.find({user:userData.id}).populate('place') );
+  });
+
 app.listen(4000);
